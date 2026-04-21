@@ -1,27 +1,32 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose'); // ייבוא ספריית mongoose לניהול הקשר עם בסיס הנתונים
 
 const RoomSchema = new mongoose.Schema({
-  // שם החדר
+  // שם החדר (למשל: "חדר 101" או "מעבדת תקשורת")
   name: {
     type: String,
-    required: true
+    required: true // שדה חובה
   },
-  // מספר קומה
+
+  // מספר הקומה בה נמצא החדר
   floor: {
     type: Number,
-    required: true
+    required: true // שדה חובה
   },
-  // אגף
+
+  // אגף בבניין - הגבלנו את האפשרויות כדי לשמור על אחידות בנתונים
   wing: {
-    type: String, // אגף - לדוגמה: "א", "ב", "צפון"
-    required: true
+    type: String,
+    required: true,
+    enum: ['אגף מרכז', 'אגף ימין', 'אגף שמאל', 'אגף חדש', 'אגף אחר'] // מאפשר לבחור רק מהרשימה הזו
   },
-  // גודל החדר ולא כמות תלמידות, קיבולת מקסימלית (כללית)
+
+  // קיבולת מקסימלית של אנשים בחדר (לפי תקן בטיחות למשל)
   capacity: {
     type: Number,
     required: true
   },
-  // סוג חדר (Enum)
+
+  // סוג החדר - משפיע על השימוש (למשל: לא נשבץ שיעור רגיל בחדר מחשבים אם לא צריך)
   roomType: {
     type: String,
     required: true,
@@ -34,62 +39,77 @@ const RoomSchema = new mongoose.Schema({
       'חדר מזכירות', 
       'חדר פרטי למרכזת/מנהלת'
     ],
-    default: 'רגיל'
+    default: 'רגיל' // אם לא יוגדר סוג, המערכת תניח שזה חדר רגיל
   },
-  // האם יש מקרן?
+
+  // האם קיים מקרן בחדר? (קריטי למרצות שמעבירות מצגות)
   hasProjector: {
     type: Boolean,
     required: true,
     default: false
   },
-  // לכמה תלמידות החדר מתאים
+
+  // מספר התלמידות שהחדר ערוך להכיל בפועל (יכול להיות שונה מה-capacity הכללי)
   numberOfStudents: { 
     type: Number,
     required: true
   },
-  // האם החדר זמין לשימוש
+
+  // האם החדר תקין וזמין לשימוש באופן כללי (לא קשור ללו"ז, אלא לתחזוקה)
   isAvailable: {
     type: Boolean,
     default: true
-  },// האם יש מערכת שמע
+  },
+
+  // האם קיימת מערכת שמע (רמקולים/הגברה) בחדר?
   hasAudioSystem: {
     type: Boolean,
     default: false
   },
-  // סוג הישיבה בחדר
+
+  // האם יש מזגן בחדר?
+  hasAC: {
+    type: Boolean,
+    default: false
+  },
+
+  // צורת הישיבה בחדר - משפיע על אופי הפעילות (למשל: סדנה דורשת ישיבה חופשית)
   seatingType: {
     type: String,
     enum: ['כסאות סטודנט', 'שולחנות', 'מעבדה', 'ישיבה חופשית'],
     default: 'שולחנות'
   },
-  // הערות מנהלתיות
+
+  // הערות חופשיות של מנהל המערכת (למשל: "החלון שבור", "המפתח אצל שרה")
   adminNotes: {
     type: String,
-    trim: true
+    trim: true // מסיר רווחים מיותרים מהתחלה והסוף של הטקסט
   },
 
-  // רשימת ההקצאות הקבועות של החדר
+  // מערך של מזהים המקשרים לשיבוצים הקבועים של החדר (מערכת שעות שבועית)
   permanentAssignments: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'PermanentAssignment'
+      ref: 'PermanentAssignment' // קישור למודל השיבוץ הקבוע
     }
   ],
-  // רשימת הקצאות זמניות של החדר
+
+  // מערך של מזהים המקשרים לשיבוצים זמניים (אירועים חד פעמיים)
   temporaryAssignments: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'TemporaryAssignment'
+      ref: 'TemporaryAssignment' // קישור למודל השיבוץ הזמני
     }
   ],
-  // רשימת ביטולים של החדר
+
+  // מערך המקשר לביטולים (למשל: אם שיעור קבוע בוטל בתאריך ספציפי)
   cancellations: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Cancellation'
+      ref: 'Cancellation' // קישור למודל הביטולים
     }
   ]
-}, { timestamps: true }); // מוסיף אוטומטית תאריך יצירה ועדכון
+}, { timestamps: true }); // מוסיף אוטומטית שדות createdAt (זמן יצירה) ו-updatedAt (זמן עדכון אחרון)
 
-// ייצוא של המודל
+// ייצוא המודל כדי שנוכל להשתמש בו ב-Controller
 module.exports = mongoose.model('Room', RoomSchema);
