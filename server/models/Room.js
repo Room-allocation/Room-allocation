@@ -16,7 +16,7 @@ const RoomSchema = new mongoose.Schema({
     type: String, // אגף - לדוגמה: "א", "ב", "צפון"
     required: true
   },
-  // קיבולת מקסימלית (כללית)
+  // גודל החדר ולא כמות תלמידות, קיבולת מקסימלית (כללית)
   capacity: {
     type: Number,
     required: true
@@ -38,19 +38,18 @@ const RoomSchema = new mongoose.Schema({
   },
   // האם יש מקרן?
   hasProjector: {
-    type: Boolean, // שימי לב: B גדולה
+    type: Boolean,
     required: true,
     default: false
   },
   // לכמה תלמידות החדר מתאים
-  numberOfStudents: { // הוספתי נקודתיים ושניתי לאות קטנה בהתחלה (מקובל יותר)
+  numberOfStudents: { 
     type: Number,
     required: true
   },
   // האם החדר זמין לשימוש
   isAvailable: {
-    type: Boolean, // שימי לב: B גדולה
-    required: true,
+    type: Boolean,
     default: true
   },// האם יש מערכת שמע
   hasAudioSystem: {
