@@ -1,33 +1,30 @@
-// const express = require('express');
-// const app = express();
-// const PORT = 5000;
-
-// app.get('/', (req, res) => {
-//     res.send('Seminar Room Booking API is running...');
-// });
-
-// app.listen(PORT, () => {
-//     console.log(`Server is running on port ${PORT}`);
-// });
-
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 
+// ייבוא הראוטר שיצרנו (שימי לב לנתיב המדויק)
+const roomRoutes = require('./Routes/roomRoutes');
+
 const app = express();
+
+// Middlewares
 app.use(cors());
 app.use(express.json());
 
+// חיבור למסד הנתונים
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('Connected to MongoDB!'))
+  .then(() => console.log('Connected to MongoDB successfully!'))
   .catch((err) => console.error('MongoDB connection error:', err));
 
-app.get('/api/rooms', async (req, res) => {
-  const rooms = await mongoose.connection.db.collection('rooms').find().toArray();
-  res.json(rooms);
+// הגדרת הקידומת לכל נתיבי החדרים
+app.use('/api/rooms', roomRoutes);
+
+app.get('/', (req, res) => {
+    res.send('API is running properly...');
 });
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server is running on port ${process.env.PORT}`);
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
