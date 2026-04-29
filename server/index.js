@@ -14,7 +14,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-
+const assignmentRoutes = require('./routes/assignmentRoutes');
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -27,6 +27,7 @@ app.get('/api/rooms', async (req, res) => {
   const rooms = await mongoose.connection.db.collection('rooms').find().toArray();
   res.json(rooms);
 });
+app.use('/api/assignments', assignmentRoutes);
 
 app.listen(process.env.PORT, () => {
   console.log(`Server is running on port ${process.env.PORT}`);
