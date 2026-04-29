@@ -1,20 +1,22 @@
 const express = require('express');
 const router = express.Router();
 // ייבוא ספציפי של הפונקציה
-const { clearAllAssignments, addPermanentAssignment, deletePermanentAssignment } = require('../controllers/assignmentController');
-
 const assignmentController = require('../controllers/assignmentController');
 
+// מחיקת כל השיבוצים הן הקבועים והן הזמניים- לצורך איפוס המערכת
+router.delete('/clear-all', assignmentController.clearAllAssignments);
 
-router.delete('/clear-all', clearAllAssignments);
-router.post('/permanent', addPermanentAssignment);
-router.delete('/permanent/:id', deletePermanentAssignment);
+// שיבוץ קבוע- הוספה ומחיקה
+router.post('/permanent', assignmentController.addPermanentAssignment);
+router.delete('/permanent/:id', assignmentController.deletePermanentAssignment);
 
-// הוספת ביטול
+// ביטול- הוספה ומחיקה
 router.post('/cancellations', assignmentController.addCancellation);
-
-// מחיקת ביטול
 router.delete('/cancellations/:id', assignmentController.deleteCancellation);
+
+// שיבוץ זמני- הוספה ומחיקה
+router.post('/temporary', assignmentController.addTemporaryAssignment);
+router.delete('/temporary/:id', assignmentController.deleteTemporaryAssignment);
 
 
 module.exports = router;
