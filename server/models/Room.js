@@ -110,6 +110,30 @@ const RoomSchema = new mongoose.Schema({
     }
   ]
 }, { timestamps: true }); // מוסיף אוטומטית שדות createdAt (זמן יצירה) ו-updatedAt (זמן עדכון אחרון)
+// --- Middleware למחיקה בשרשרת ---
 
+// 1. אנחנו משתמשים ב-async ללא הפרמטר next
+RoomSchema.pre('findOneAndDelete', async function() {
+    
+    // 2. 'this' בקשר הזה מייצג את השאילתה (Query) שעומדת להתבצע.
+    // אנחנו שולפים ממנה את ה-ID של החדר שעומד להימחק.
+    const roomId = this.getQuery()._id; 
+
+    try {
+        // 3. אנחנו ניגשים למודל השיבוצים דרך mongoose.model כדי למנוע בעיות של טעינה מעגלית.
+        // הפקודה deleteMany מוחקת את כל המסמכים שעונים על התנאי.
+        await mongoose.model('PermanentAssignment').deleteMany({ room: roomId });
+        
+        console.log(`מערכת: כל השיבוצים של חדר ${roomId} נמחקו אוטומטית.`);
+        
+        // הערה חשובה: בגלל שהפונקציה היא async, ברגע שהיא מסתיימת, 
+        // Mongoose מבין שהכל תקין וממשיך למחיקת החדר עצמו באופן אוטומטי.
+    } catch (err) {
+        console.error("שגיאה במחיקה בשרשרת:", err);
+        // 4. אם יש שגיאה, אנחנו "זורקים" אותה. זה עוצר את מחיקת החדר
+        // ושולח את השגיאה לקונטרולר שיציג אותה למשתמש.
+        throw err; 
+    }
+});
 // ייצוא המודל כדי שנוכל להשתמש בו ב-Controller
 module.exports = mongoose.model('Room', RoomSchema);

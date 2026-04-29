@@ -1,4 +1,5 @@
 const Room = require('../models/Room');
+const PermanentAssignment = require('../models/PermanentAssignment')
 
 // 1. קבלת כל החדרים
 exports.getAllRooms = async (req, res) => {
@@ -9,7 +10,7 @@ exports.getAllRooms = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
-
+//  קבלת חדר לפי ID
 exports.getRoomById = async (req, res) => {
      try {
         const room = await Room.findById(req.params.id);
@@ -24,7 +25,7 @@ exports.getRoomById = async (req, res) => {
     }
 };
 
-// 2. יצירת חדר חדש
+//  יצירת חדר חדש
 exports.createRoom = async (req, res) => {
     try {
         const newRoom = new Room(req.body);
@@ -35,7 +36,7 @@ exports.createRoom = async (req, res) => {
     }
 };
 
-// 3. עדכון חדר קיים
+// דכון חדר קיים
 exports.updateRoom = async (req, res) => {
     try {
         const updatedRoom = await Room.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -45,11 +46,30 @@ exports.updateRoom = async (req, res) => {
     }
 };
 
-// 4. מחיקת חדר
+// 5. מחיקת חדר (הגרסה המשודרגת!)
 exports.deleteRoom = async (req, res) => {
     try {
-        await Room.findByIdAndDelete(req.params.id);
-        res.status(200).json({ message: 'Room deleted successfully' });
+        const roomId = req.params.id;
+
+        // שלב א': מחפשים את השיבוצים כדי שיהיה לנו מידע להחזיר למשתמש
+        const assignmentsToDelete = await PermanentAssignment.find({ room: roomId });
+        
+        // שלב ב': מוחקים את החדר (ה-Middleware במודל כבר ימחק את השיבוצים ב-DB)
+        const deletedRoom = await Room.findByIdAndDelete(roomId);
+
+        if (!deletedRoom) {
+            return res.status(404).json({ message: "החדר לא נמצא" });
+        }
+
+        // שלב ג': מחזירים תשובה חכמה למסך
+        res.status(200).json({ 
+            message: `החדר "${deletedRoom.name}" נמחק בהצלחה.`,
+            deletedAssignmentsCount: assignmentsToDelete.length,
+            details: assignmentsToDelete.map(a => ({
+                subject: a.subject,
+                lecturer: a.lecturerName
+            }))
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
