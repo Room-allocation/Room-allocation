@@ -36,7 +36,7 @@ exports.createRoom = async (req, res) => {
     }
 };
 
-// דכון חדר קיים
+// עדכון חדר קיים
 exports.updateRoom = async (req, res) => {
     try {
         const updatedRoom = await Room.findByIdAndUpdate(req.params.id, req.body, { new: true });
