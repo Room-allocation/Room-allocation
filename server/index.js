@@ -16,15 +16,12 @@ app.use(express.json());
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('Connected to MongoDB successfully!'))
   .catch((err) => console.error('MongoDB connection error:', err));
+
 // הגדרת הקידומת לכל נתיבי החדרים
 app.use('/api/rooms', roomRoutes);
 
 app.get('/', (req, res) => {
     res.send('API is running properly...');
-});
-app.get('/api/rooms', async (req, res) => {
-  const rooms = await mongoose.connection.db.collection('rooms').find().toArray();
-  res.json(rooms);
 });
 app.use('/api/assignments', assignmentRoutes);
 
