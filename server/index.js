@@ -12,8 +12,7 @@ const app = express(); // יצירת מופע של אפליקציית השרת
 app.use(cors()); // הפעלת הגדרות CORS כדי למנוע חסימות גישה מהדפדפן
 app.use(express.json()); // מאפשר לשרת לקרוא ולהבין מידע שנשלח בפורמט JSON בתוך גוף הבקשה (body)
 const assignmentRoutes = require('./routes/assignmentRoutes');
-// ייבוא הראוטר שיצרנו (שימי לב לנתיב המדויק)
-const roomRoutes = require('./Routes/roomRoutes');
+
 
 // התחברות למסד הנתונים באמצעות הכתובת שנמצאת במשתני הסביבה
 mongoose.connect(process.env.MONGO_URI)
