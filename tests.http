@@ -1,0 +1,51 @@
+### בדיקת קבלת כל החדרים
+GET http://localhost:5000/api/rooms
+
+###
+
+### יצירת חדר חדש
+POST http://localhost:5000/api/rooms
+Content-Type: application/json
+
+{
+  "name": "חדר 101 בדיקה סופית",
+  "floor": 1,
+  "wing": "אגף מרכז",
+  "capacity": 30,
+  "roomType": "רגיל",
+  "hasProjector": true,
+  "numberOfStudents": 25
+}
+
+###
+
+### חיפוש חדר פנוי
+GET http://localhost:5000/api/rooms/search?wing=אגף מרכז&capacity=20
+
+### חיפוש לפי אגף וקיבולת
+GET http://localhost:5000/api/rooms/search?wing=אגף מרכז&capacity=25
+
+### חיפוש בשעה שבה החדר תפוס
+GET http://localhost:5000/api/rooms/search?date=2026-05-10&startHour=10:30&endHour=11:30
+
+
+### הוספת שיבוץ זמני לבדיקה
+POST http://localhost:5000/api/assignments/temporary
+Content-Type: application/json
+
+{
+  "date": "2026-05-10",
+  "startHour": "11:00",
+  "endHour": "14:00",
+  "room": "69f0cd8573a9a84eb63676e7",
+  "subject": "בדיקת מערכת",
+  "bookedBy": {
+    "operatorName": "בודק",
+    "phone": "050-1234567",
+    "eventType": "שיעור"
+  }
+}
+
+### חיפוש חדר פנוי
+GET http://localhost:5000/api/rooms/search?date=2026-05-08&startHour=14:27&endHour=22:27&capacity=3&roomType=רגיל
+Content-Type: application/json

@@ -2,43 +2,40 @@ require('dotenv').config();
 const express = require('express'); 
 const mongoose = require('mongoose');
 const cors = require('cors');
-// ייבוא הראוטרים שמכילים את הגדרות ה-API עבור כל ישות
-const roomRoutes = require('./Routes/roomRoutes'); // ראוטר לניהול חדרים
- // ראוטר לניהול שיבוצים קבועים
+
+// ייבוא הראוטרים
+const roomRoutes = require('./Routes/roomRoutes'); 
 const permanentRoutes = require('./Routes/permanentAssignmentRoutes');
-const app = express(); // יצירת מופע של אפליקציית השרת
+const assignmentRoutes = require('./Routes/assignmentRoutes'); // ודאי שהתיקייה היא Routes עם R גדולה
 
-// Middlewares - פונקציות ביניים שרצות על כל בקשה שמגיעה לשרת
-app.use(cors()); // הפעלת הגדרות CORS כדי למנוע חסימות גישה מהדפדפן
-app.use(express.json()); // מאפשר לשרת לקרוא ולהבין מידע שנשלח בפורמט JSON בתוך גוף הבקשה (body)
-const assignmentRoutes = require('./routes/assignmentRoutes');
-// ייבוא הראוטר שיצרנו (שימי לב לנתיב המדויק)
-const roomRoutes = require('./Routes/roomRoutes');
+const app = express();
 
-// התחברות למסד הנתונים באמצעות הכתובת שנמצאת במשתני הסביבה
+// Middlewares - הגדרות בסיסיות לשרת
+app.use(cors()); 
+app.use(express.json()); // מאפשר קריאת JSON מה-Body
+app.use(express.urlencoded({ extended: true }));
+
+// התחברות למסד הנתונים
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('Connected to MongoDB successfully!')) // הדפסה במקרה של הצלחה
-  .catch((err) => console.error('MongoDB connection error:', err)); // הדפסת שגיאה במקרה של כישלון התחברות
+  .then(() => console.log('Connected to MongoDB successfully!'))
+  .catch((err) => console.error('MongoDB connection error:', err));
 
-// הגדרת נתיבי ה-API והצמדתם לראוטרים המתאימים
-app.use('/api/rooms', roomRoutes); // כל בקשה שתתחיל בנתיב זה תופנה לניהול החדרים
-app.use('/api/permanent-assignments', permanentRoutes); // כל בקשה שתתחיל בנתיב זה תופנה לניהול השיבוצים
-
-// נתיב בדיקה בסיסי כדי לוודא שהשרת באוויר
-app.get('/', (req, res) => {
-    res.send('API is running properly...'); // מחזיר הודעת טקסט פשוטה לדפדפן
-});
+// הגדרת נתיבי ה-API
+app.use('/api/rooms', roomRoutes); 
+app.use('/api/permanent-assignments', permanentRoutes);
 app.use('/api/assignments', assignmentRoutes);
 
-// הגדרת הפורט עליו ירוץ השרת (מתוך משתני הסביבה או ברירת מחדל 5000)
+// נתיבי בדיקה
+app.get('/', (req, res) => {
+    res.send('API is running properly...');
+});
+
+app.get('/api/test-now', (req, res) => {
+    res.send("השרת מגיב מצוין!");
+});
+
+// הגדרת פורט והפעלת השרת
 const PORT = process.env.PORT || 5000;
-
-
-
-//רק לניסוי
-app.get('/api/test-now', (req, res) => res.send("השרת מגיב מצוין!"));
-
-// הפעלת השרת והתחלת האזנה לבקשות נכנסות
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`); // הדפסת הודעה שהשרת מוכן לעבודה
+  console.log(`Server is running on port ${PORT}`);
 });
