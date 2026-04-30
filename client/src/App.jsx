@@ -35,14 +35,27 @@
 // export default App
 
 
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import RoomList from './components/RoomList';
+import RoomSearch from './components/RoomSearch';
 
 function App() {
   return (
-    <div>
-      <h1>מערכת הזמנת חדרים</h1>
-      <RoomList />
-    </div>
+    <Router>
+      <div style={{ direction: 'rtl', fontFamily: 'Arial', padding: '20px' }}>
+        <nav style={{ marginBottom: '20px', padding: '10px', backgroundColor: '#f4f4f4', borderRadius: '8px' }}>
+          <Link to="/" style={{ marginLeft: '20px', textDecoration: 'none', color: '#007bff', fontWeight: 'bold' }}>📋 רשימת חדרים</Link>
+          <Link to="/search" style={{ textDecoration: 'none', color: '#007bff', fontWeight: 'bold' }}>🔍 חיפוש חדר</Link>
+        </nav>
+
+        <h1>מערכת הזמנת חדרים</h1>
+
+        <Routes>
+          <Route path="/" element={<RoomList />} />
+          <Route path="/search" element={<RoomSearch />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
